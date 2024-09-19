@@ -392,7 +392,7 @@ func TestWeightConverter(t *testing.T) {
 			expectErr: false,
 		},
 		{
-			name:      "❌ invalid from unit",
+			name:      "❌ invalid unit type",
 			unitType:  "invalid",
 			fromUnit:  Pounds,
 			toUnit:    Grams,
@@ -401,7 +401,7 @@ func TestWeightConverter(t *testing.T) {
 			expectErr: true,
 		},
 		{
-			name:      "❌ invalid to unit",
+			name:      "❌ invalid from unit",
 			unitType:  Weight,
 			fromUnit:  "invalid",
 			toUnit:    Grams,
@@ -410,7 +410,7 @@ func TestWeightConverter(t *testing.T) {
 			expectErr: true,
 		},
 		{
-			name:      "❌ invalid unit type",
+			name:      "❌ invalid to unit",
 			unitType:  Weight,
 			fromUnit:  Pounds,
 			toUnit:    "invalid",
