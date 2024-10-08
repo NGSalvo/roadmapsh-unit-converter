@@ -1,5 +1,35 @@
 package components
 
 templ Home(name string) {
-	<div>Hello, { name }</div>
+	@page("Unit Converter") {
+		<div>Hello, { name }</div>
+	}
+}
+
+templ page(title string) {
+	<!DOCTYPE html>
+	<html lang="en" class="h-screen max-h-screen bg-ctp-base">
+		@head(title)
+		<body class="h-screen isolate bg-ctp-crust">
+			<div class="h-full overflow-y-scroll">
+				<div class="relative pt-8 sm:pt-12">
+					<main>
+						{ children... }
+					</main>
+				</div>
+			</div>
+		</body>
+	</html>
+}
+
+templ head(title string) {
+	<head>
+		<meta charset="UTF-8"/>
+		<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+		<title>{ title }</title>
+		<link rel="shortcut icon" href="static/images/favicon.ico" type="image/x-icon"/>
+		<link rel="stylesheet" href="/static/styles/style.css"/>
+		<link rel="preconnect" href="https://fonts.googleapi.com"/>
+		<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin/>
+	</head>
 }
