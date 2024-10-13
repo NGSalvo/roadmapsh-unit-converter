@@ -1,0 +1,14 @@
+package components
+
+templ Result() {
+	@page("Result") {
+		<div class="flex flex-col h-screen items-center justify-center">
+			@title()
+			@nav()
+			<p class="mb-4 mt-4">Result of your calculation</p>
+			<p class="text-3xl mb-6">20ft = 609cm</p>
+			<a href="/" class="bg-primary px-10 py-2 text-xl font-semibold text-background rounded hover:brightness-90 shadow shadow-primary/10 transition-all scale-[1.4]">Reset</a>
+			<a class="mt-5" href="/items/1?id=2">Item</a>
+		</div>
+	}
+}

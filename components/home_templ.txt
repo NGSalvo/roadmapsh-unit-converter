@@ -1,7 +1,9 @@
-<div>Hello, 
-</div>
+<div class=\"flex flex-col h-screen items-center justify-center\">
+<form><div class=\"mb-4 mt-4\"><label class=\"block text-gray-700 text-sm font-bold mb-2\" for=\"value\">Enter the length to convert</label> <input class=\"shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:border-accent\" id=\"value\" type=\"text\"></div><div class=\"mb-3\"><label class=\"block text-gray-700 text-sm font-bold mb-2\" for=\"unitToConvertFrom\">Unit to Convert from</label> <input class=\"shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:border-accent\" id=\"unitToConvertFrom\" type=\"text\"></div><div class=\"mb-6\"><label class=\"block text-gray-700 text-sm font-bold mb-2\" for=\"unitToConvertTo\">Unit to Convert to</label> <input class=\"shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:border-accent\" id=\"unitToConvertTo\" type=\"text\"></div><a href=\"/result\" class=\"bg-primary px-10 py-2 text-xl font-semibold text-background rounded hover:brightness-90 shadow shadow-primary/10 transition-all scale-[1.4]\">Convert</a></form><a class=\"mt-5\" href=\"/items/1?id=2\">Item</a></div>
 <!doctype html><html lang=\"en\" class=\"h-screen max-h-screen bg-ctp-base\">
-<body class=\"h-screen isolate bg-ctp-crust\"><div class=\"h-full overflow-y-scroll\"><div class=\"relative pt-8 sm:pt-12\"><main>
-</main></div></div></body></html>
+<body class=\"h-screen isolate bg-background text-text\"><div class=\"w-full h-full overflow-y-scroll\"><main>
+</main></div></body></html>
 <head><meta charset=\"UTF-8\"><meta name=\"viewport\" content=\"width=device-width, initial-scale=1.0\"><title>
 </title><link rel=\"shortcut icon\" href=\"static/images/favicon.ico\" type=\"image/x-icon\"><link rel=\"stylesheet\" href=\"/static/styles/style.css\"><link rel=\"preconnect\" href=\"https://fonts.googleapi.com\"><link rel=\"preconnect\" href=\"https://fonts.gstatic.com\" crossorigin></head>
+<h1 class=\"text-center font-bold text-4xl md:text-6xl uppercase bg-gradient-to-r from-text to-primary text-transparent bg-clip-text tracking-wider mb-2\">Unit Converter</h1>
+<ul class=\"flex\"><li class=\"mr-6\"><a class=\"text-secondary hover:text-accent\" href=\"/length\">Length</a></li><li class=\"mr-6\"><a class=\"text-text hover:text-accent\" href=\"/weight\">Weight</a></li><li class=\"mr-6\"><a class=\"text-text hover:text-accent\" href=\"/temperature\">Temperature</a></li></ul>
