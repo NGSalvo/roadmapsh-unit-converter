@@ -3,28 +3,28 @@ package components
 var linksNoActive = []Link{
 	{
 		source:   "/",
-		text:     "Length",
-		isActive: false,
+		Text:     "Length",
+		IsActive: false,
 	},
 	{
 		source:   "/weight",
-		text:     "Weight",
-		isActive: false,
+		Text:     "Weight",
+		IsActive: false,
 	},
 	{
 		source:   "/temperature",
-		text:     "Temperature",
-		isActive: false,
+		Text:     "Temperature",
+		IsActive: false,
 	},
 }
 
-templ Result() {
+templ Result(value string, convertFrom string, convertTo string, result string) {
 	@page("Result") {
 		<div class="flex flex-col h-screen items-center justify-center">
 			@title()
 			@nav(linksNoActive)
 			<p class="mb-4 mt-4">Result of your calculation</p>
-			<p class="text-3xl mb-6">20ft = 609cm</p>
+			<p class="text-3xl mb-6">{ value } { convertFrom } = { result } { convertTo }</p>
 			<a href="/" class="bg-primary px-10 py-2 text-xl font-semibold text-background rounded hover:brightness-90 shadow shadow-primary/10 transition-all scale-[1.4]">Reset</a>
 		</div>
 	}

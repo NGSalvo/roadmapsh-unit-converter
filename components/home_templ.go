@@ -8,35 +8,48 @@ package components
 import "github.com/a-h/templ"
 import templruntime "github.com/a-h/templ/runtime"
 
+import "fmt"
+
 type Link struct {
 	source   string
-	text     string
-	isActive bool
+	Text     string
+	IsActive bool
 }
 
 func (l *Link) markAsActive() {
-	l.isActive = true
+	l.IsActive = true
 }
 
 func (l *Link) markAsInactive() {
-	l.isActive = false
+	l.IsActive = false
 }
 
-var linksLengthAsActive = []Link{
+type Links []Link
+
+func (l *Links) getURLActive() string {
+	for _, link := range *l {
+		if link.IsActive {
+			return link.Text
+		}
+	}
+	return ""
+}
+
+var linksLengthAsActive = Links{
 	{
 		source:   "/",
-		text:     "Length",
-		isActive: true,
+		Text:     "Length",
+		IsActive: true,
 	},
 	{
 		source:   "/weight",
-		text:     "Weight",
-		isActive: false,
+		Text:     "Weight",
+		IsActive: false,
 	},
 	{
 		source:   "/temperature",
-		text:     "Temperature",
-		isActive: false,
+		Text:     "Temperature",
+		IsActive: false,
 	},
 }
 
@@ -85,7 +98,7 @@ func Home() templ.Component {
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
-			templ_7745c5c3_Err = form().Render(ctx, templ_7745c5c3_Buffer)
+			templ_7745c5c3_Err = form(linksLengthAsActive).Render(ctx, templ_7745c5c3_Buffer)
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
@@ -176,7 +189,7 @@ func head(title string) templ.Component {
 		var templ_7745c5c3_Var5 string
 		templ_7745c5c3_Var5, templ_7745c5c3_Err = templ.JoinStringErrs(title)
 		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `components/home.templ`, Line: 64, Col: 16}
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `components/home.templ`, Line: 77, Col: 16}
 		}
 		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var5))
 		if templ_7745c5c3_Err != nil {
@@ -219,7 +232,7 @@ func title() templ.Component {
 	})
 }
 
-func nav(links []Link) templ.Component {
+func nav(links Links) templ.Component {
 	return templruntime.GeneratedTemplate(func(templ_7745c5c3_Input templruntime.GeneratedComponentInput) (templ_7745c5c3_Err error) {
 		templ_7745c5c3_W, ctx := templ_7745c5c3_Input.Writer, templ_7745c5c3_Input.Context
 		if templ_7745c5c3_CtxErr := ctx.Err(); templ_7745c5c3_CtxErr != nil {
@@ -249,7 +262,7 @@ func nav(links []Link) templ.Component {
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
-			var templ_7745c5c3_Var8 = []any{"hover:text-accent", templ.KV("text-secondary", link.isActive)}
+			var templ_7745c5c3_Var8 = []any{"hover:text-accent", templ.KV("text-secondary", link.IsActive)}
 			templ_7745c5c3_Err = templ.RenderCSSItems(ctx, templ_7745c5c3_Buffer, templ_7745c5c3_Var8...)
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
@@ -281,9 +294,9 @@ func nav(links []Link) templ.Component {
 				return templ_7745c5c3_Err
 			}
 			var templ_7745c5c3_Var11 string
-			templ_7745c5c3_Var11, templ_7745c5c3_Err = templ.JoinStringErrs(link.text)
+			templ_7745c5c3_Var11, templ_7745c5c3_Err = templ.JoinStringErrs(link.Text)
 			if templ_7745c5c3_Err != nil {
-				return templ.Error{Err: templ_7745c5c3_Err, FileName: `components/home.templ`, Line: 79, Col: 139}
+				return templ.Error{Err: templ_7745c5c3_Err, FileName: `components/home.templ`, Line: 92, Col: 139}
 			}
 			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var11))
 			if templ_7745c5c3_Err != nil {
@@ -302,7 +315,7 @@ func nav(links []Link) templ.Component {
 	})
 }
 
-func form() templ.Component {
+func form(links Links) templ.Component {
 	return templruntime.GeneratedTemplate(func(templ_7745c5c3_Input templruntime.GeneratedComponentInput) (templ_7745c5c3_Err error) {
 		templ_7745c5c3_W, ctx := templ_7745c5c3_Input.Writer, templ_7745c5c3_Input.Context
 		if templ_7745c5c3_CtxErr := ctx.Err(); templ_7745c5c3_CtxErr != nil {
@@ -327,8 +340,22 @@ func form() templ.Component {
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
+		var templ_7745c5c3_Var13 templ.SafeURL = templ.URL(parseURL(links))
+		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(string(templ_7745c5c3_Var13)))
+		if templ_7745c5c3_Err != nil {
+			return templ_7745c5c3_Err
+		}
+		templ_7745c5c3_Err = templ.WriteWatchModeString(templ_7745c5c3_Buffer, 17)
+		if templ_7745c5c3_Err != nil {
+			return templ_7745c5c3_Err
+		}
 		return templ_7745c5c3_Err
 	})
+}
+
+func parseURL(links Links) string {
+	unitType := links.getURLActive()
+	return fmt.Sprintf("/result?unitType=%s", unitType)
 }
 
 var _ = templruntime.GeneratedTemplate

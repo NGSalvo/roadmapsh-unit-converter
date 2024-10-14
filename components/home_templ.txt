@@ -1,5 +1,5 @@
 <div class=\"flex flex-col h-screen items-center justify-center\">
-<a class=\"mt-5\" href=\"/items/1?id=2\">Item</a></div>
+</div>
 <!doctype html><html lang=\"en\" class=\"h-screen max-h-screen bg-ctp-base\">
 <body class=\"h-screen isolate bg-background text-text\"><div class=\"w-full h-full overflow-y-scroll\"><main>
 </main></div></body></html>
@@ -13,4 +13,5 @@
 \">
 </a></li>
 </ul>
-<form><div class=\"mb-4 mt-4\"><label class=\"block text-gray-700 text-sm font-bold mb-2\" for=\"value\">Enter the value to convert</label> <input class=\"shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:border-accent\" id=\"value\" type=\"text\"></div><div class=\"mb-3\"><label class=\"block text-gray-700 text-sm font-bold mb-2\" for=\"unitToConvertFrom\">Unit to Convert from</label> <input class=\"shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:border-accent\" id=\"unitToConvertFrom\" type=\"text\"></div><div class=\"mb-6\"><label class=\"block text-gray-700 text-sm font-bold mb-2\" for=\"unitToConvertTo\">Unit to Convert to</label> <input class=\"shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:border-accent\" id=\"unitToConvertTo\" type=\"text\"></div><a href=\"/result\" class=\"bg-primary px-10 py-2 text-xl font-semibold text-background rounded hover:brightness-90 shadow shadow-primary/10 transition-all scale-[1.4]\">Convert</a></form>
+<form action=\"
+\" method=\"POST\"><div class=\"mb-4 mt-4\"><label class=\"block text-gray-700 text-sm font-bold mb-2\" for=\"value\">Enter the value to convert</label> <input class=\"shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:border-accent\" name=\"value\" id=\"value\" type=\"text\"></div><div class=\"mb-3\"><label class=\"block text-gray-700 text-sm font-bold mb-2\" for=\"unitToConvertFrom\">Unit to Convert from</label> <input class=\"shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:border-accent\" name=\"unitToConvertFrom\" id=\"unitToConvertFrom\" type=\"text\"></div><div class=\"mb-6\"><label class=\"block text-gray-700 text-sm font-bold mb-2\" for=\"unitToConvertTo\">Unit to Convert to</label> <input class=\"shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:border-accent\" name=\"unitToConvertTo\" id=\"unitToConvertTo\" type=\"text\"></div><button type=\"submit\" class=\"bg-primary px-10 py-2 text-xl font-semibold text-background rounded hover:brightness-90 shadow shadow-primary/10\">Convert</button></form>

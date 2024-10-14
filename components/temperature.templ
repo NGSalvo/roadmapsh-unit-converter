@@ -3,18 +3,18 @@ package components
 var linksTemperatureAsActive = []Link{
 	{
 		source:   "/",
-		text:     "Length",
-		isActive: false,
+		Text:     "Length",
+		IsActive: false,
 	},
 	{
 		source:   "/weight",
-		text:     "Weight",
-		isActive: false,
+		Text:     "Weight",
+		IsActive: false,
 	},
 	{
 		source:   "/temperature",
-		text:     "Temperature",
-		isActive: true,
+		Text:     "Temperature",
+		IsActive: true,
 	},
 }
 
@@ -23,7 +23,7 @@ templ Temperature() {
 		<div class="flex flex-col h-screen items-center justify-center">
 			@title()
 			@nav(linksTemperatureAsActive)
-			@form()
+			@form(linksTemperatureAsActive)
 		</div>
 	}
 }

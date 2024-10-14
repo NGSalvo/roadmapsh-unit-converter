@@ -5,9 +5,12 @@ import (
 	"log/slog"
 	"net/http"
 	"os"
+	"strconv"
+	"strings"
 	"time"
 
 	"github.com/ngsalvo/roadmapsh-unit-converter/components"
+	"github.com/ngsalvo/roadmapsh-unit-converter/services"
 )
 
 type Middleware func(http.Handler) http.Handler
@@ -53,7 +56,7 @@ func main() {
 
 	router.HandleFunc("GET /{$}", homeHandler)
 	router.Handle("GET /static/", http.StripPrefix("/static/", fileServer))
-	router.HandleFunc("GET /result", resultHandler)
+	router.HandleFunc("POST /result", resultHandler)
 	router.HandleFunc("GET /weight", weightHandler)
 	router.HandleFunc("GET /temperature", temperatureHandler)
 	router.HandleFunc("GET /items/{id}", getOne)
@@ -77,7 +80,28 @@ func homeHandler(w http.ResponseWriter, r *http.Request) {
 
 func resultHandler(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-Type", "text/html")
-	components.Result().Render(r.Context(), w)
+
+	r.ParseForm()
+
+	value := r.Form.Get("value")
+	unitToConvertFrom := r.Form.Get("unitToConvertFrom")
+	unitToConvertTo := r.Form.Get("unitToConvertTo")
+
+	unitType := strings.ToLower(r.URL.Query().Get("unitType"))
+
+	logger := log.New(os.Stdout, "http: ", log.LstdFlags)
+	logger.Printf("\n------------\nunit type %s value %s from %s to %s\n------------", unitType, value, unitToConvertFrom, unitToConvertTo)
+
+	if value == "" || unitToConvertFrom == "" || unitToConvertTo == "" {
+		components.Home().Render(r.Context(), w)
+	}
+
+	valueToConvert, _ := strconv.ParseFloat(value, 64)
+
+	result, err := services.Convert(services.UnitType(unitType), services.Unit(unitToConvertFrom), services.Unit(unitToConvertTo), valueToConvert)
+
+	logger.Printf("\n------------\nresult %f - error %s \n------------", result, err)
+	components.Result(value, unitToConvertFrom, unitToConvertTo, strconv.FormatFloat(result, 'f', -1, 64)).Render(r.Context(), w)
 }
 
 func weightHandler(w http.ResponseWriter, r *http.Request) {

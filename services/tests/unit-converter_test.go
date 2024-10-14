@@ -3,8 +3,8 @@ package tests
 import (
 	"fmt"
 	"testing"
-	"unit-converter/services"
 
+	"github.com/ngsalvo/roadmapsh-unit-converter/services"
 	"github.com/stretchr/testify/assert"
 )
 
