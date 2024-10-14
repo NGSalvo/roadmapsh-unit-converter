@@ -23,29 +23,7 @@ templ Weight() {
 		<div class="flex flex-col h-screen items-center justify-center">
 			@title()
 			@nav(linksWeightAsActive)
-			<form>
-				<div class="mb-4 mt-4">
-					<label class="block text-gray-700 text-sm font-bold mb-2" for="value">
-						Enter the length to convert
-					</label>
-					<input class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:border-accent" id="value" type="text"/>
-				</div>
-				<div class="mb-3">
-					<label class="block text-gray-700 text-sm font-bold mb-2" for="unitToConvertFrom">
-						Unit to Convert from
-					</label>
-					<input class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:border-accent" id="unitToConvertFrom" type="text"/>
-				</div>
-				<div class="mb-6">
-					<label class="block text-gray-700 text-sm font-bold mb-2" for="unitToConvertTo">
-						Unit to Convert to
-					</label>
-					<input class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:border-accent" id="unitToConvertTo" type="text"/>
-				</div>
-				<a href="/result" class="bg-primary px-10 py-2 text-xl font-semibold text-background rounded hover:brightness-90 shadow shadow-primary/10 transition-all scale-[1.4]">
-					Convert
-				</a>
-			</form>
+			@form()
 		</div>
 	}
 }
