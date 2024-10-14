@@ -8,7 +8,11 @@ package components
 import "github.com/a-h/templ"
 import templruntime "github.com/a-h/templ/runtime"
 
-import "fmt"
+import (
+	"fmt"
+	"github.com/ngsalvo/roadmapsh-unit-converter/services"
+	"strings"
+)
 
 type Link struct {
 	source   string
@@ -50,6 +54,109 @@ var linksLengthAsActive = Links{
 		source:   "/temperature",
 		Text:     "Temperature",
 		IsActive: false,
+	},
+}
+
+var FirstSelection = map[services.UnitType]map[services.Unit]string{
+	services.Temperature: {
+		services.Celsius:    "celsius",
+		services.Fahrenheit: "fahrenheit",
+		services.Kelvin:     "kelvin",
+	},
+	services.Length: {
+		services.Meters:     "meters",
+		services.Kilometers: "kilometers",
+		services.Feet:       "feet",
+		services.Yards:      "yards",
+		services.Miles:      "miles",
+	},
+	services.Weight: {
+		services.Milligrams: "milligrams",
+		services.Grams:      "grams",
+		services.Kilograms:  "kilograms",
+		services.Ounces:     "ounces",
+		services.Pounds:     "pounds",
+	},
+}
+
+var ConversionTable = map[services.UnitType]map[services.Unit]map[services.Unit]string{
+	services.Temperature: {
+		services.Celsius: {
+			services.Fahrenheit: "fahrenheit",
+			services.Kelvin:     "kelvin",
+		},
+		services.Fahrenheit: {
+			services.Celsius: "celsius",
+			services.Kelvin:  "kelvin",
+		},
+		services.Kelvin: {
+			services.Celsius:    "celsius",
+			services.Fahrenheit: "fahrenheit",
+		},
+	},
+	services.Length: {
+		services.Meters: {
+			services.Kilometers: "kilometers",
+			services.Feet:       "feet",
+			services.Yards:      "yards",
+			services.Miles:      "miles",
+		},
+		services.Kilometers: {
+			services.Meters: "meters",
+			services.Feet:   "feet",
+			services.Yards:  "yards",
+			services.Miles:  "miles",
+		},
+		services.Feet: {
+			services.Meters:     "meters",
+			services.Kilometers: "kilometers",
+			services.Yards:      "yards",
+			services.Miles:      "miles",
+		},
+		services.Yards: {
+			services.Meters:     "meters",
+			services.Kilometers: "kilometers",
+			services.Feet:       "feet",
+			services.Miles:      "miles",
+		},
+		services.Miles: {
+			services.Meters:     "meters",
+			services.Kilometers: "kilometers",
+			services.Feet:       "feet",
+			services.Yards:      "yards",
+		},
+	},
+	services.Weight: {
+		services.Milligrams: {
+			services.Grams:     "grams",
+			services.Kilograms: "kilograms",
+			services.Ounces:    "ounces",
+			services.Pounds:    "pounds",
+		},
+		services.Grams: {
+			services.Milligrams: "milligrams",
+			services.Kilograms:  "kilograms",
+			services.Ounces:     "ounces",
+			services.Pounds:     "pounds",
+		},
+		services.Kilograms: {
+			services.Milligrams: "milligrams",
+			services.Grams:      "grams",
+			services.Ounces:     "ounces",
+			services.Pounds:     "pounds",
+		},
+		services.Ounces: {
+			services.Milligrams: "milligrams",
+			services.Grams:      "grams",
+			services.Kilograms:  "kilograms",
+			services.Pounds:     "pounds",
+		},
+		services.Pounds: {
+			services.Milligrams: "milligrams",
+			services.Grams:      "grams",
+			services.Kilograms:  "kilograms",
+			services.Ounces:     "ounces",
+		},
 	},
 }
 
@@ -189,7 +296,7 @@ func head(title string) templ.Component {
 		var templ_7745c5c3_Var5 string
 		templ_7745c5c3_Var5, templ_7745c5c3_Err = templ.JoinStringErrs(title)
 		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `components/home.templ`, Line: 77, Col: 16}
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `components/home.templ`, Line: 184, Col: 16}
 		}
 		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var5))
 		if templ_7745c5c3_Err != nil {
@@ -296,7 +403,7 @@ func nav(links Links) templ.Component {
 			var templ_7745c5c3_Var11 string
 			templ_7745c5c3_Var11, templ_7745c5c3_Err = templ.JoinStringErrs(link.Text)
 			if templ_7745c5c3_Err != nil {
-				return templ.Error{Err: templ_7745c5c3_Err, FileName: `components/home.templ`, Line: 92, Col: 139}
+				return templ.Error{Err: templ_7745c5c3_Err, FileName: `components/home.templ`, Line: 199, Col: 139}
 			}
 			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var11))
 			if templ_7745c5c3_Err != nil {
@@ -346,6 +453,78 @@ func form(links Links) templ.Component {
 			return templ_7745c5c3_Err
 		}
 		templ_7745c5c3_Err = templ.WriteWatchModeString(templ_7745c5c3_Buffer, 17)
+		if templ_7745c5c3_Err != nil {
+			return templ_7745c5c3_Err
+		}
+		for _, elementBeingCompared := range FirstSelection[services.UnitType(strings.ToLower(links.getURLActive()))] {
+			templ_7745c5c3_Err = templ.WriteWatchModeString(templ_7745c5c3_Buffer, 18)
+			if templ_7745c5c3_Err != nil {
+				return templ_7745c5c3_Err
+			}
+			var templ_7745c5c3_Var14 string
+			templ_7745c5c3_Var14, templ_7745c5c3_Err = templ.JoinStringErrs(elementBeingCompared)
+			if templ_7745c5c3_Err != nil {
+				return templ.Error{Err: templ_7745c5c3_Err, FileName: `components/home.templ`, Line: 218, Col: 41}
+			}
+			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var14))
+			if templ_7745c5c3_Err != nil {
+				return templ_7745c5c3_Err
+			}
+			templ_7745c5c3_Err = templ.WriteWatchModeString(templ_7745c5c3_Buffer, 19)
+			if templ_7745c5c3_Err != nil {
+				return templ_7745c5c3_Err
+			}
+			var templ_7745c5c3_Var15 string
+			templ_7745c5c3_Var15, templ_7745c5c3_Err = templ.JoinStringErrs(elementBeingCompared)
+			if templ_7745c5c3_Err != nil {
+				return templ.Error{Err: templ_7745c5c3_Err, FileName: `components/home.templ`, Line: 218, Col: 66}
+			}
+			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var15))
+			if templ_7745c5c3_Err != nil {
+				return templ_7745c5c3_Err
+			}
+			templ_7745c5c3_Err = templ.WriteWatchModeString(templ_7745c5c3_Buffer, 20)
+			if templ_7745c5c3_Err != nil {
+				return templ_7745c5c3_Err
+			}
+		}
+		templ_7745c5c3_Err = templ.WriteWatchModeString(templ_7745c5c3_Buffer, 21)
+		if templ_7745c5c3_Err != nil {
+			return templ_7745c5c3_Err
+		}
+		for _, elementBeingCompared := range FirstSelection[services.UnitType(strings.ToLower(links.getURLActive()))] {
+			templ_7745c5c3_Err = templ.WriteWatchModeString(templ_7745c5c3_Buffer, 22)
+			if templ_7745c5c3_Err != nil {
+				return templ_7745c5c3_Err
+			}
+			var templ_7745c5c3_Var16 string
+			templ_7745c5c3_Var16, templ_7745c5c3_Err = templ.JoinStringErrs(elementBeingCompared)
+			if templ_7745c5c3_Err != nil {
+				return templ.Error{Err: templ_7745c5c3_Err, FileName: `components/home.templ`, Line: 228, Col: 41}
+			}
+			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var16))
+			if templ_7745c5c3_Err != nil {
+				return templ_7745c5c3_Err
+			}
+			templ_7745c5c3_Err = templ.WriteWatchModeString(templ_7745c5c3_Buffer, 23)
+			if templ_7745c5c3_Err != nil {
+				return templ_7745c5c3_Err
+			}
+			var templ_7745c5c3_Var17 string
+			templ_7745c5c3_Var17, templ_7745c5c3_Err = templ.JoinStringErrs(elementBeingCompared)
+			if templ_7745c5c3_Err != nil {
+				return templ.Error{Err: templ_7745c5c3_Err, FileName: `components/home.templ`, Line: 228, Col: 66}
+			}
+			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var17))
+			if templ_7745c5c3_Err != nil {
+				return templ_7745c5c3_Err
+			}
+			templ_7745c5c3_Err = templ.WriteWatchModeString(templ_7745c5c3_Buffer, 24)
+			if templ_7745c5c3_Err != nil {
+				return templ_7745c5c3_Err
+			}
+		}
+		templ_7745c5c3_Err = templ.WriteWatchModeString(templ_7745c5c3_Buffer, 25)
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}

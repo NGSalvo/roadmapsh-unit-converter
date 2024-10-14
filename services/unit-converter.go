@@ -46,6 +46,11 @@ const (
 	Pounds     Unit = "pounds"
 )
 
+// Unit to String
+func (u Unit) String() string {
+	return string(u)
+}
+
 // ConversionTable holds the conversion functions for different unit types
 var ConversionTable = map[UnitType]map[Unit]map[Unit]ConverterFunc{
 	Temperature: {

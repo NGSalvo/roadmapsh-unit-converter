@@ -1,6 +1,10 @@
 package components
 
-import "fmt"
+import (
+	"fmt"
+	"github.com/ngsalvo/roadmapsh-unit-converter/services"
+	"strings"
+)
 
 type Link struct {
 	source   string
@@ -42,6 +46,109 @@ var linksLengthAsActive = Links{
 		source:   "/temperature",
 		Text:     "Temperature",
 		IsActive: false,
+	},
+}
+
+var FirstSelection = map[services.UnitType]map[services.Unit]string{
+	services.Temperature: {
+		services.Celsius:    "celsius",
+		services.Fahrenheit: "fahrenheit",
+		services.Kelvin:     "kelvin",
+	},
+	services.Length: {
+		services.Meters:     "meters",
+		services.Kilometers: "kilometers",
+		services.Feet:       "feet",
+		services.Yards:      "yards",
+		services.Miles:      "miles",
+	},
+	services.Weight: {
+		services.Milligrams: "milligrams",
+		services.Grams:      "grams",
+		services.Kilograms:  "kilograms",
+		services.Ounces:     "ounces",
+		services.Pounds:     "pounds",
+	},
+}
+
+var ConversionTable = map[services.UnitType]map[services.Unit]map[services.Unit]string{
+	services.Temperature: {
+		services.Celsius: {
+			services.Fahrenheit: "fahrenheit",
+			services.Kelvin:     "kelvin",
+		},
+		services.Fahrenheit: {
+			services.Celsius: "celsius",
+			services.Kelvin:  "kelvin",
+		},
+		services.Kelvin: {
+			services.Celsius:    "celsius",
+			services.Fahrenheit: "fahrenheit",
+		},
+	},
+	services.Length: {
+		services.Meters: {
+			services.Kilometers: "kilometers",
+			services.Feet:       "feet",
+			services.Yards:      "yards",
+			services.Miles:      "miles",
+		},
+		services.Kilometers: {
+			services.Meters: "meters",
+			services.Feet:   "feet",
+			services.Yards:  "yards",
+			services.Miles:  "miles",
+		},
+		services.Feet: {
+			services.Meters:     "meters",
+			services.Kilometers: "kilometers",
+			services.Yards:      "yards",
+			services.Miles:      "miles",
+		},
+		services.Yards: {
+			services.Meters:     "meters",
+			services.Kilometers: "kilometers",
+			services.Feet:       "feet",
+			services.Miles:      "miles",
+		},
+		services.Miles: {
+			services.Meters:     "meters",
+			services.Kilometers: "kilometers",
+			services.Feet:       "feet",
+			services.Yards:      "yards",
+		},
+	},
+	services.Weight: {
+		services.Milligrams: {
+			services.Grams:     "grams",
+			services.Kilograms: "kilograms",
+			services.Ounces:    "ounces",
+			services.Pounds:    "pounds",
+		},
+		services.Grams: {
+			services.Milligrams: "milligrams",
+			services.Kilograms:  "kilograms",
+			services.Ounces:     "ounces",
+			services.Pounds:     "pounds",
+		},
+		services.Kilograms: {
+			services.Milligrams: "milligrams",
+			services.Grams:      "grams",
+			services.Ounces:     "ounces",
+			services.Pounds:     "pounds",
+		},
+		services.Ounces: {
+			services.Milligrams: "milligrams",
+			services.Grams:      "grams",
+			services.Kilograms:  "kilograms",
+			services.Pounds:     "pounds",
+		},
+		services.Pounds: {
+			services.Milligrams: "milligrams",
+			services.Grams:      "grams",
+			services.Kilograms:  "kilograms",
+			services.Ounces:     "ounces",
+		},
 	},
 }
 
@@ -106,13 +213,21 @@ templ form(links Links) {
 			<label class="block text-gray-700 text-sm font-bold mb-2" for="unitToConvertFrom">
 				Unit to Convert from
 			</label>
-			<input class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:border-accent" name="unitToConvertFrom" id="unitToConvertFrom" type="text"/>
+			<select class="block appearance-none w-full bg-white border border-gray-400 hover:border-gray-500 px-4 py-2 pr-8 rounded shadow leading-tight focus:border-accent" name="unitToConvertFrom">
+				for _, elementBeingCompared := range FirstSelection[services.UnitType(strings.ToLower(links.getURLActive()))] {
+					<option value={ elementBeingCompared }>{ elementBeingCompared }</option>
+				}
+			</select>
 		</div>
 		<div class="mb-6">
 			<label class="block text-gray-700 text-sm font-bold mb-2" for="unitToConvertTo">
 				Unit to Convert to
 			</label>
-			<input class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:border-accent" name="unitToConvertTo" id="unitToConvertTo" type="text"/>
+			<select class="block appearance-none w-full bg-white border border-gray-400 hover:border-gray-500 px-4 py-2 pr-8 rounded shadow leading-tight focus:border-accent" name="unitToConvertTo">
+				for _, elementBeingCompared := range FirstSelection[services.UnitType(strings.ToLower(links.getURLActive()))] {
+					<option value={ elementBeingCompared }>{ elementBeingCompared }</option>
+				}
+			</select>
 		</div>
 		<button type="submit" class="bg-primary px-10 py-2 text-xl font-semibold text-background rounded hover:brightness-90 shadow shadow-primary/10">
 			Convert
