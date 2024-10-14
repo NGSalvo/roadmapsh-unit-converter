@@ -51,9 +51,11 @@ func main() {
 		LoggingMiddleware,
 	)
 
-	router.HandleFunc("GET /{$}", helloWorldHandler)
+	router.HandleFunc("GET /{$}", homeHandler)
 	router.Handle("GET /static/", http.StripPrefix("/static/", fileServer))
-	router.HandleFunc("GET /result", createHandler)
+	router.HandleFunc("GET /result", resultHandler)
+	router.HandleFunc("GET /weight", weightHandler)
+	router.HandleFunc("GET /temperature", temperatureHandler)
 	router.HandleFunc("GET /items/{id}", getOne)
 
 	// nesting path
@@ -67,15 +69,25 @@ func main() {
 
 }
 
-func helloWorldHandler(w http.ResponseWriter, r *http.Request) {
+func homeHandler(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-Type", "text/html")
 
-	components.Home("ME!").Render(r.Context(), w)
+	components.Home().Render(r.Context(), w)
 }
 
-func createHandler(w http.ResponseWriter, r *http.Request) {
+func resultHandler(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-Type", "text/html")
 	components.Result().Render(r.Context(), w)
+}
+
+func weightHandler(w http.ResponseWriter, r *http.Request) {
+	w.Header().Set("Content-Type", "text/html")
+	components.Weight().Render(r.Context(), w)
+}
+
+func temperatureHandler(w http.ResponseWriter, r *http.Request) {
+	w.Header().Set("Content-Type", "text/html")
+	components.Temperature().Render(r.Context(), w)
 }
 
 func getOne(w http.ResponseWriter, r *http.Request) {

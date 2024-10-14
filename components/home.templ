@@ -1,10 +1,42 @@
 package components
 
-templ Home(name string) {
+type Link struct {
+	source   string
+	text     string
+	isActive bool
+}
+
+func (l *Link) markAsActive() {
+	l.isActive = true
+}
+
+func (l *Link) markAsInactive() {
+	l.isActive = false
+}
+
+var linksLengthAsActive = []Link{
+	{
+		source:   "/",
+		text:     "Length",
+		isActive: true,
+	},
+	{
+		source:   "/weight",
+		text:     "Weight",
+		isActive: false,
+	},
+	{
+		source:   "/temperature",
+		text:     "Temperature",
+		isActive: false,
+	},
+}
+
+templ Home() {
 	@page("Unit Converter") {
 		<div class="flex flex-col h-screen items-center justify-center">
 			@title()
-			@nav()
+			@nav(linksLengthAsActive)
 			<form>
 				<div class="mb-4 mt-4">
 					<label class="block text-gray-700 text-sm font-bold mb-2" for="value">
@@ -63,10 +95,10 @@ templ title() {
 	<h1 class="text-center font-bold text-4xl md:text-6xl uppercase bg-gradient-to-r from-text to-primary text-transparent bg-clip-text tracking-wider mb-2">Unit Converter</h1>
 }
 
-templ nav() {
+templ nav(links []Link) {
 	<ul class="flex">
-		<li class="mr-6"><a class="text-secondary hover:text-accent" href="/length">Length</a></li>
-		<li class="mr-6"><a class="text-text hover:text-accent" href="/weight">Weight</a></li>
-		<li class="mr-6"><a class="text-text hover:text-accent" href="/temperature">Temperature</a></li>
+		for _, link := range links {
+			<li class="mr-6"><a class={ "hover:text-accent", templ.KV("text-secondary", link.isActive) } href={ templ.URL(link.source) }>{ link.text }</a></li>
+		}
 	</ul>
 }

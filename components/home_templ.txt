@@ -6,4 +6,10 @@
 <head><meta charset=\"UTF-8\"><meta name=\"viewport\" content=\"width=device-width, initial-scale=1.0\"><title>
 </title><link rel=\"shortcut icon\" href=\"static/images/favicon.ico\" type=\"image/x-icon\"><link rel=\"stylesheet\" href=\"/static/styles/style.css\"><link rel=\"preconnect\" href=\"https://fonts.googleapi.com\"><link rel=\"preconnect\" href=\"https://fonts.gstatic.com\" crossorigin></head>
 <h1 class=\"text-center font-bold text-4xl md:text-6xl uppercase bg-gradient-to-r from-text to-primary text-transparent bg-clip-text tracking-wider mb-2\">Unit Converter</h1>
-<ul class=\"flex\"><li class=\"mr-6\"><a class=\"text-secondary hover:text-accent\" href=\"/length\">Length</a></li><li class=\"mr-6\"><a class=\"text-text hover:text-accent\" href=\"/weight\">Weight</a></li><li class=\"mr-6\"><a class=\"text-text hover:text-accent\" href=\"/temperature\">Temperature</a></li></ul>
+<ul class=\"flex\">
+<li class=\"mr-6\">
+<a class=\"
+\" href=\"
+\">
+</a></li>
+</ul>
