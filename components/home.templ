@@ -109,7 +109,7 @@ type Form struct {
 }
 
 templ TabForm(unitType string) {
-	<div id="tab-form" data-store='{"valueToConvert": 0, "unitToConvertFrom": "meters", "unitToConvertTo": "miles"}'>
+	<div id="tab-form" data-store.ifmissing='{"valueToConvert": 0, "unitToConvertFrom": "meters", "unitToConvertTo": "miles"}'>
 		<div class="mb-4 mt-4">
 			<label class="block text-gray-700 text-sm font-bold mb-2" for="valueToConvert">
 				Enter the value to convert
