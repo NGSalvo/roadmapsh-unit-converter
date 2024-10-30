@@ -109,7 +109,6 @@ type Form struct {
 }
 
 templ TabForm(unitType string) {
-	// <form action={ templ.URL(parseURL(links)) } method="POST">
 	<div id="tab-form" data-store='{"valueToConvert": 0, "unitToConvertFrom": "meters", "unitToConvertTo": "miles"}'>
 		<div class="mb-4 mt-4">
 			<label class="block text-gray-700 text-sm font-bold mb-2" for="valueToConvert">
@@ -141,7 +140,6 @@ templ TabForm(unitType string) {
 			Convert
 		</button>
 	</div>
-	// </form>
 }
 
 func parseURL(unitType string) string {
