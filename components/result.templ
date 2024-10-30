@@ -1,31 +1,11 @@
 package components
 
-var linksNoActive = []Link{
-	{
-		source:   "/",
-		Text:     "Length",
-		IsActive: false,
-	},
-	{
-		source:   "/weight",
-		Text:     "Weight",
-		IsActive: false,
-	},
-	{
-		source:   "/temperature",
-		Text:     "Temperature",
-		IsActive: false,
-	},
-}
+import "fmt"
 
 templ Result(value string, convertFrom string, convertTo string, result string) {
-	@page("Result") {
-		<div class="flex flex-col h-screen items-center justify-center">
-			@title()
-			@nav(linksNoActive)
-			<p class="mb-4 mt-4">Result of your calculation</p>
-			<p class="text-3xl mb-6">{ value } { convertFrom } = { result } { convertTo }</p>
-			<a href="/" class="bg-primary px-10 py-2 text-xl font-semibold text-background rounded hover:brightness-90 shadow shadow-primary/10 transition-all scale-[1.4]">Reset</a>
-		</div>
-	}
+	<div id="result" class="flex flex-col items-center">
+		<p class="mb-4 mt-4">Result of your calculation</p>
+		<p class="text-3xl mb-6 bleed-effect">{ value } { convertFrom } = { result } { convertTo }</p>
+		<button class="bg-primary px-10 py-2 text-xl font-semibold text-background rounded hover:brightness-90 shadow shadow-primary/10" data-on-click={ fmt.Sprintf("$unitType='%s';$$get('/tabs/update')", "length") }>Reset</button>
+	</div>
 }

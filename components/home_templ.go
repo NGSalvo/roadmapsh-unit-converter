@@ -14,49 +14,6 @@ import (
 	"strings"
 )
 
-type Link struct {
-	source   string
-	Text     string
-	IsActive bool
-}
-
-func (l *Link) markAsActive() {
-	l.IsActive = true
-}
-
-func (l *Link) markAsInactive() {
-	l.IsActive = false
-}
-
-type Links []Link
-
-func (l *Links) getURLActive() string {
-	for _, link := range *l {
-		if link.IsActive {
-			return link.Text
-		}
-	}
-	return ""
-}
-
-var linksLengthAsActive = Links{
-	{
-		source:   "/",
-		Text:     "Length",
-		IsActive: true,
-	},
-	{
-		source:   "/weight",
-		Text:     "Weight",
-		IsActive: false,
-	},
-	{
-		source:   "/temperature",
-		Text:     "Temperature",
-		IsActive: false,
-	},
-}
-
 var FirstSelection = map[services.UnitType]map[services.Unit]string{
 	services.Temperature: {
 		services.Celsius:    "celsius",
@@ -76,87 +33,6 @@ var FirstSelection = map[services.UnitType]map[services.Unit]string{
 		services.Kilograms:  "kilograms",
 		services.Ounces:     "ounces",
 		services.Pounds:     "pounds",
-	},
-}
-
-var ConversionTable = map[services.UnitType]map[services.Unit]map[services.Unit]string{
-	services.Temperature: {
-		services.Celsius: {
-			services.Fahrenheit: "fahrenheit",
-			services.Kelvin:     "kelvin",
-		},
-		services.Fahrenheit: {
-			services.Celsius: "celsius",
-			services.Kelvin:  "kelvin",
-		},
-		services.Kelvin: {
-			services.Celsius:    "celsius",
-			services.Fahrenheit: "fahrenheit",
-		},
-	},
-	services.Length: {
-		services.Meters: {
-			services.Kilometers: "kilometers",
-			services.Feet:       "feet",
-			services.Yards:      "yards",
-			services.Miles:      "miles",
-		},
-		services.Kilometers: {
-			services.Meters: "meters",
-			services.Feet:   "feet",
-			services.Yards:  "yards",
-			services.Miles:  "miles",
-		},
-		services.Feet: {
-			services.Meters:     "meters",
-			services.Kilometers: "kilometers",
-			services.Yards:      "yards",
-			services.Miles:      "miles",
-		},
-		services.Yards: {
-			services.Meters:     "meters",
-			services.Kilometers: "kilometers",
-			services.Feet:       "feet",
-			services.Miles:      "miles",
-		},
-		services.Miles: {
-			services.Meters:     "meters",
-			services.Kilometers: "kilometers",
-			services.Feet:       "feet",
-			services.Yards:      "yards",
-		},
-	},
-	services.Weight: {
-		services.Milligrams: {
-			services.Grams:     "grams",
-			services.Kilograms: "kilograms",
-			services.Ounces:    "ounces",
-			services.Pounds:    "pounds",
-		},
-		services.Grams: {
-			services.Milligrams: "milligrams",
-			services.Kilograms:  "kilograms",
-			services.Ounces:     "ounces",
-			services.Pounds:     "pounds",
-		},
-		services.Kilograms: {
-			services.Milligrams: "milligrams",
-			services.Grams:      "grams",
-			services.Ounces:     "ounces",
-			services.Pounds:     "pounds",
-		},
-		services.Ounces: {
-			services.Milligrams: "milligrams",
-			services.Grams:      "grams",
-			services.Kilograms:  "kilograms",
-			services.Pounds:     "pounds",
-		},
-		services.Pounds: {
-			services.Milligrams: "milligrams",
-			services.Grams:      "grams",
-			services.Kilograms:  "kilograms",
-			services.Ounces:     "ounces",
-		},
 	},
 }
 
@@ -201,11 +77,7 @@ func Home() templ.Component {
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
-			templ_7745c5c3_Err = nav(linksLengthAsActive).Render(ctx, templ_7745c5c3_Buffer)
-			if templ_7745c5c3_Err != nil {
-				return templ_7745c5c3_Err
-			}
-			templ_7745c5c3_Err = form(linksLengthAsActive).Render(ctx, templ_7745c5c3_Buffer)
+			templ_7745c5c3_Err = TabNav(&Store{UnitType: "length", UnitToConvertFrom: "meters", UnitToConvertTo: "miles"}, TabForm("length")).Render(ctx, templ_7745c5c3_Buffer)
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
@@ -296,7 +168,7 @@ func head(title string) templ.Component {
 		var templ_7745c5c3_Var5 string
 		templ_7745c5c3_Var5, templ_7745c5c3_Err = templ.JoinStringErrs(title)
 		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `components/home.templ`, Line: 184, Col: 16}
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `components/home.templ`, Line: 59, Col: 16}
 		}
 		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var5))
 		if templ_7745c5c3_Err != nil {
@@ -339,7 +211,28 @@ func title() templ.Component {
 	})
 }
 
-func nav(links Links) templ.Component {
+type Tab struct {
+	Text     string
+	UnitType string
+	Active   bool
+}
+
+type Tabs []Tab
+
+var tabs = Tabs{
+	{Text: "Length", UnitType: "length", Active: true},
+	{Text: "Weight", UnitType: "weight", Active: false},
+	{Text: "Temperature", UnitType: "temperature", Active: false},
+}
+
+type Store struct {
+	UnitType          string  `json:"unitType"`
+	UnitToConvertFrom string  `json:"unitToConvertFrom"`
+	UnitToConvertTo   string  `json:"unitToConvertTo"`
+	ValueToConvert    float64 `json:"valueToConvert"`
+}
+
+func TabNav(store *Store, tabContent templ.Component) templ.Component {
 	return templruntime.GeneratedTemplate(func(templ_7745c5c3_Input templruntime.GeneratedComponentInput) (templ_7745c5c3_Err error) {
 		templ_7745c5c3_W, ctx := templ_7745c5c3_Input.Writer, templ_7745c5c3_Input.Context
 		if templ_7745c5c3_CtxErr := ctx.Err(); templ_7745c5c3_CtxErr != nil {
@@ -364,13 +257,22 @@ func nav(links Links) templ.Component {
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		for _, link := range links {
-			templ_7745c5c3_Err = templ.WriteWatchModeString(templ_7745c5c3_Buffer, 10)
-			if templ_7745c5c3_Err != nil {
-				return templ_7745c5c3_Err
-			}
-			var templ_7745c5c3_Var8 = []any{"hover:text-accent", templ.KV("text-secondary", link.IsActive)}
-			templ_7745c5c3_Err = templ.RenderCSSItems(ctx, templ_7745c5c3_Buffer, templ_7745c5c3_Var8...)
+		var templ_7745c5c3_Var8 string
+		templ_7745c5c3_Var8, templ_7745c5c3_Err = templ.JoinStringErrs(templ.JSONString(store))
+		if templ_7745c5c3_Err != nil {
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `components/home.templ`, Line: 93, Col: 52}
+		}
+		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var8))
+		if templ_7745c5c3_Err != nil {
+			return templ_7745c5c3_Err
+		}
+		templ_7745c5c3_Err = templ.WriteWatchModeString(templ_7745c5c3_Buffer, 10)
+		if templ_7745c5c3_Err != nil {
+			return templ_7745c5c3_Err
+		}
+		for _, tab := range tabs {
+			var templ_7745c5c3_Var9 = []any{"mr-6", templ.KV("text-secondary", tab.UnitType == store.UnitType)}
+			templ_7745c5c3_Err = templ.RenderCSSItems(ctx, templ_7745c5c3_Buffer, templ_7745c5c3_Var9...)
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
@@ -378,12 +280,12 @@ func nav(links Links) templ.Component {
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
-			var templ_7745c5c3_Var9 string
-			templ_7745c5c3_Var9, templ_7745c5c3_Err = templ.JoinStringErrs(templ.CSSClasses(templ_7745c5c3_Var8).String())
+			var templ_7745c5c3_Var10 string
+			templ_7745c5c3_Var10, templ_7745c5c3_Err = templ.JoinStringErrs(templ.CSSClasses(templ_7745c5c3_Var9).String())
 			if templ_7745c5c3_Err != nil {
 				return templ.Error{Err: templ_7745c5c3_Err, FileName: `components/home.templ`, Line: 1, Col: 0}
 			}
-			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var9))
+			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var10))
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
@@ -391,8 +293,12 @@ func nav(links Links) templ.Component {
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
-			var templ_7745c5c3_Var10 templ.SafeURL = templ.URL(link.source)
-			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(string(templ_7745c5c3_Var10)))
+			var templ_7745c5c3_Var11 string
+			templ_7745c5c3_Var11, templ_7745c5c3_Err = templ.JoinStringErrs(fmt.Sprintf("$unitType='%s';$$get('/tabs/update')", tab.UnitType))
+			if templ_7745c5c3_Err != nil {
+				return templ.Error{Err: templ_7745c5c3_Err, FileName: `components/home.templ`, Line: 96, Col: 181}
+			}
+			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var11))
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
@@ -400,12 +306,12 @@ func nav(links Links) templ.Component {
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
-			var templ_7745c5c3_Var11 string
-			templ_7745c5c3_Var11, templ_7745c5c3_Err = templ.JoinStringErrs(link.Text)
+			var templ_7745c5c3_Var12 string
+			templ_7745c5c3_Var12, templ_7745c5c3_Err = templ.JoinStringErrs(tab.Text)
 			if templ_7745c5c3_Err != nil {
-				return templ.Error{Err: templ_7745c5c3_Err, FileName: `components/home.templ`, Line: 199, Col: 139}
+				return templ.Error{Err: templ_7745c5c3_Err, FileName: `components/home.templ`, Line: 96, Col: 194}
 			}
-			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var11))
+			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var12))
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
@@ -418,11 +324,25 @@ func nav(links Links) templ.Component {
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
+		templ_7745c5c3_Err = tabContent.Render(ctx, templ_7745c5c3_Buffer)
+		if templ_7745c5c3_Err != nil {
+			return templ_7745c5c3_Err
+		}
+		templ_7745c5c3_Err = templ.WriteWatchModeString(templ_7745c5c3_Buffer, 16)
+		if templ_7745c5c3_Err != nil {
+			return templ_7745c5c3_Err
+		}
 		return templ_7745c5c3_Err
 	})
 }
 
-func form(links Links) templ.Component {
+type Form struct {
+	Value             float64 `json:"valueToConvert"`
+	UnitToConvertFrom string  `json:"unitToConvertFrom"`
+	UnitToConverTo    string  `json:"unitToConvertTo"`
+}
+
+func TabForm(unitType string) templ.Component {
 	return templruntime.GeneratedTemplate(func(templ_7745c5c3_Input templruntime.GeneratedComponentInput) (templ_7745c5c3_Err error) {
 		templ_7745c5c3_W, ctx := templ_7745c5c3_Input.Writer, templ_7745c5c3_Input.Context
 		if templ_7745c5c3_CtxErr := ctx.Err(); templ_7745c5c3_CtxErr != nil {
@@ -438,25 +358,16 @@ func form(links Links) templ.Component {
 			}()
 		}
 		ctx = templ.InitializeContext(ctx)
-		templ_7745c5c3_Var12 := templ.GetChildren(ctx)
-		if templ_7745c5c3_Var12 == nil {
-			templ_7745c5c3_Var12 = templ.NopComponent
+		templ_7745c5c3_Var13 := templ.GetChildren(ctx)
+		if templ_7745c5c3_Var13 == nil {
+			templ_7745c5c3_Var13 = templ.NopComponent
 		}
 		ctx = templ.ClearChildren(ctx)
-		templ_7745c5c3_Err = templ.WriteWatchModeString(templ_7745c5c3_Buffer, 16)
-		if templ_7745c5c3_Err != nil {
-			return templ_7745c5c3_Err
-		}
-		var templ_7745c5c3_Var13 templ.SafeURL = templ.URL(parseURL(links))
-		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(string(templ_7745c5c3_Var13)))
-		if templ_7745c5c3_Err != nil {
-			return templ_7745c5c3_Err
-		}
 		templ_7745c5c3_Err = templ.WriteWatchModeString(templ_7745c5c3_Buffer, 17)
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		for _, elementBeingCompared := range FirstSelection[services.UnitType(strings.ToLower(links.getURLActive()))] {
+		for _, elementBeingCompared := range FirstSelection[services.UnitType(strings.ToLower(unitType))] {
 			templ_7745c5c3_Err = templ.WriteWatchModeString(templ_7745c5c3_Buffer, 18)
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
@@ -464,7 +375,7 @@ func form(links Links) templ.Component {
 			var templ_7745c5c3_Var14 string
 			templ_7745c5c3_Var14, templ_7745c5c3_Err = templ.JoinStringErrs(elementBeingCompared)
 			if templ_7745c5c3_Err != nil {
-				return templ.Error{Err: templ_7745c5c3_Err, FileName: `components/home.templ`, Line: 218, Col: 41}
+				return templ.Error{Err: templ_7745c5c3_Err, FileName: `components/home.templ`, Line: 126, Col: 41}
 			}
 			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var14))
 			if templ_7745c5c3_Err != nil {
@@ -477,7 +388,7 @@ func form(links Links) templ.Component {
 			var templ_7745c5c3_Var15 string
 			templ_7745c5c3_Var15, templ_7745c5c3_Err = templ.JoinStringErrs(elementBeingCompared)
 			if templ_7745c5c3_Err != nil {
-				return templ.Error{Err: templ_7745c5c3_Err, FileName: `components/home.templ`, Line: 218, Col: 66}
+				return templ.Error{Err: templ_7745c5c3_Err, FileName: `components/home.templ`, Line: 126, Col: 66}
 			}
 			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var15))
 			if templ_7745c5c3_Err != nil {
@@ -492,7 +403,7 @@ func form(links Links) templ.Component {
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		for _, elementBeingCompared := range FirstSelection[services.UnitType(strings.ToLower(links.getURLActive()))] {
+		for _, elementBeingCompared := range FirstSelection[services.UnitType(strings.ToLower(unitType))] {
 			templ_7745c5c3_Err = templ.WriteWatchModeString(templ_7745c5c3_Buffer, 22)
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
@@ -500,7 +411,7 @@ func form(links Links) templ.Component {
 			var templ_7745c5c3_Var16 string
 			templ_7745c5c3_Var16, templ_7745c5c3_Err = templ.JoinStringErrs(elementBeingCompared)
 			if templ_7745c5c3_Err != nil {
-				return templ.Error{Err: templ_7745c5c3_Err, FileName: `components/home.templ`, Line: 228, Col: 41}
+				return templ.Error{Err: templ_7745c5c3_Err, FileName: `components/home.templ`, Line: 136, Col: 41}
 			}
 			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var16))
 			if templ_7745c5c3_Err != nil {
@@ -513,7 +424,7 @@ func form(links Links) templ.Component {
 			var templ_7745c5c3_Var17 string
 			templ_7745c5c3_Var17, templ_7745c5c3_Err = templ.JoinStringErrs(elementBeingCompared)
 			if templ_7745c5c3_Err != nil {
-				return templ.Error{Err: templ_7745c5c3_Err, FileName: `components/home.templ`, Line: 228, Col: 66}
+				return templ.Error{Err: templ_7745c5c3_Err, FileName: `components/home.templ`, Line: 136, Col: 66}
 			}
 			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var17))
 			if templ_7745c5c3_Err != nil {
@@ -532,8 +443,7 @@ func form(links Links) templ.Component {
 	})
 }
 
-func parseURL(links Links) string {
-	unitType := links.getURLActive()
+func parseURL(unitType string) string {
 	return fmt.Sprintf("/result?unitType=%s", unitType)
 }
 

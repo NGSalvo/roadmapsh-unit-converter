@@ -6,49 +6,6 @@ import (
 	"strings"
 )
 
-type Link struct {
-	source   string
-	Text     string
-	IsActive bool
-}
-
-func (l *Link) markAsActive() {
-	l.IsActive = true
-}
-
-func (l *Link) markAsInactive() {
-	l.IsActive = false
-}
-
-type Links []Link
-
-func (l *Links) getURLActive() string {
-	for _, link := range *l {
-		if link.IsActive {
-			return link.Text
-		}
-	}
-	return ""
-}
-
-var linksLengthAsActive = Links{
-	{
-		source:   "/",
-		Text:     "Length",
-		IsActive: true,
-	},
-	{
-		source:   "/weight",
-		Text:     "Weight",
-		IsActive: false,
-	},
-	{
-		source:   "/temperature",
-		Text:     "Temperature",
-		IsActive: false,
-	},
-}
-
 var FirstSelection = map[services.UnitType]map[services.Unit]string{
 	services.Temperature: {
 		services.Celsius:    "celsius",
@@ -71,94 +28,11 @@ var FirstSelection = map[services.UnitType]map[services.Unit]string{
 	},
 }
 
-var ConversionTable = map[services.UnitType]map[services.Unit]map[services.Unit]string{
-	services.Temperature: {
-		services.Celsius: {
-			services.Fahrenheit: "fahrenheit",
-			services.Kelvin:     "kelvin",
-		},
-		services.Fahrenheit: {
-			services.Celsius: "celsius",
-			services.Kelvin:  "kelvin",
-		},
-		services.Kelvin: {
-			services.Celsius:    "celsius",
-			services.Fahrenheit: "fahrenheit",
-		},
-	},
-	services.Length: {
-		services.Meters: {
-			services.Kilometers: "kilometers",
-			services.Feet:       "feet",
-			services.Yards:      "yards",
-			services.Miles:      "miles",
-		},
-		services.Kilometers: {
-			services.Meters: "meters",
-			services.Feet:   "feet",
-			services.Yards:  "yards",
-			services.Miles:  "miles",
-		},
-		services.Feet: {
-			services.Meters:     "meters",
-			services.Kilometers: "kilometers",
-			services.Yards:      "yards",
-			services.Miles:      "miles",
-		},
-		services.Yards: {
-			services.Meters:     "meters",
-			services.Kilometers: "kilometers",
-			services.Feet:       "feet",
-			services.Miles:      "miles",
-		},
-		services.Miles: {
-			services.Meters:     "meters",
-			services.Kilometers: "kilometers",
-			services.Feet:       "feet",
-			services.Yards:      "yards",
-		},
-	},
-	services.Weight: {
-		services.Milligrams: {
-			services.Grams:     "grams",
-			services.Kilograms: "kilograms",
-			services.Ounces:    "ounces",
-			services.Pounds:    "pounds",
-		},
-		services.Grams: {
-			services.Milligrams: "milligrams",
-			services.Kilograms:  "kilograms",
-			services.Ounces:     "ounces",
-			services.Pounds:     "pounds",
-		},
-		services.Kilograms: {
-			services.Milligrams: "milligrams",
-			services.Grams:      "grams",
-			services.Ounces:     "ounces",
-			services.Pounds:     "pounds",
-		},
-		services.Ounces: {
-			services.Milligrams: "milligrams",
-			services.Grams:      "grams",
-			services.Kilograms:  "kilograms",
-			services.Pounds:     "pounds",
-		},
-		services.Pounds: {
-			services.Milligrams: "milligrams",
-			services.Grams:      "grams",
-			services.Kilograms:  "kilograms",
-			services.Ounces:     "ounces",
-		},
-	},
-}
-
 templ Home() {
 	@page("Unit Converter") {
 		<div class="flex flex-col h-screen items-center justify-center">
 			@title()
-			@nav(linksLengthAsActive)
-			@form(linksLengthAsActive)
-			// <a class="mt-5" href="/items/1?id=2">Item</a>
+			@TabNav(&Store{UnitType: "length", UnitToConvertFrom: "meters", UnitToConvertTo: "miles"}, TabForm("length"))
 		</div>
 	}
 }
@@ -181,6 +55,7 @@ templ head(title string) {
 	<head>
 		<meta charset="UTF-8"/>
 		<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+		<script type="module" defer src="https://cdn.jsdelivr.net/npm/@sudodevnull/datastar"></script>
 		<title>{ title }</title>
 		<link rel="shortcut icon" href="static/images/favicon.ico" type="image/x-icon"/>
 		<link rel="stylesheet" href="/static/styles/style.css"/>
@@ -193,28 +68,61 @@ templ title() {
 	<h1 class="text-center font-bold text-4xl md:text-6xl uppercase bg-gradient-to-r from-text to-primary text-transparent bg-clip-text tracking-wider mb-2">Unit Converter</h1>
 }
 
-templ nav(links Links) {
-	<ul class="flex">
-		for _, link := range links {
-			<li class="mr-6"><a class={ "hover:text-accent", templ.KV("text-secondary", link.IsActive) } href={ templ.URL(link.source) }>{ link.Text }</a></li>
-		}
-	</ul>
+type Tab struct {
+	Text     string
+	UnitType string
+	Active   bool
 }
 
-templ form(links Links) {
-	<form action={ templ.URL(parseURL(links)) } method="POST">
+type Tabs []Tab
+
+var tabs = Tabs{
+	{Text: "Length", UnitType: "length", Active: true},
+	{Text: "Weight", UnitType: "weight", Active: false},
+	{Text: "Temperature", UnitType: "temperature", Active: false},
+}
+
+type Store struct {
+	UnitType          string  `json:"unitType"`
+	UnitToConvertFrom string  `json:"unitToConvertFrom"`
+	UnitToConvertTo   string  `json:"unitToConvertTo"`
+	ValueToConvert    float64 `json:"valueToConvert"`
+}
+
+templ TabNav(store *Store, tabContent templ.Component) {
+	<div id="tabs" data-store={ templ.JSONString(store) } class="h-[334px]">
+		<div role="tablist" class="flex justify-center">
+			for _, tab := range tabs {
+				<button role="tab" class={ "mr-6" ,templ.KV("text-secondary", tab.UnitType == store.UnitType) } data-on-click={ fmt.Sprintf("$unitType='%s';$$get('/tabs/update')", tab.UnitType) }>{ tab.Text }</button>
+			}
+		</div>
+		<div id="tab-content">
+			@tabContent
+		</div>
+	</div>
+}
+
+type Form struct {
+	Value             float64 `json:"valueToConvert"`
+	UnitToConvertFrom string  `json:"unitToConvertFrom"`
+	UnitToConverTo    string  `json:"unitToConvertTo"`
+}
+
+templ TabForm(unitType string) {
+	// <form action={ templ.URL(parseURL(links)) } method="POST">
+	<div id="tab-form" data-store='{"valueToConvert": 0, "unitToConvertFrom": "meters", "unitToConvertTo": "miles"}'>
 		<div class="mb-4 mt-4">
-			<label class="block text-gray-700 text-sm font-bold mb-2" for="value">
+			<label class="block text-gray-700 text-sm font-bold mb-2" for="valueToConvert">
 				Enter the value to convert
 			</label>
-			<input class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:border-accent" name="value" id="value" type="text"/>
+			<input class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:border-accent" data-model="valueToConvert" type="number" step="0.1"/>
 		</div>
 		<div class="mb-3">
 			<label class="block text-gray-700 text-sm font-bold mb-2" for="unitToConvertFrom">
 				Unit to Convert from
 			</label>
-			<select class="block appearance-none w-full bg-white border border-gray-400 hover:border-gray-500 px-4 py-2 pr-8 rounded shadow leading-tight focus:border-accent" name="unitToConvertFrom">
-				for _, elementBeingCompared := range FirstSelection[services.UnitType(strings.ToLower(links.getURLActive()))] {
+			<select class="block appearance-none w-full bg-white border border-gray-400 hover:border-gray-500 px-4 py-2 pr-8 rounded shadow leading-tight focus:border-accent" data-model="unitToConvertFrom">
+				for _, elementBeingCompared := range FirstSelection[services.UnitType(strings.ToLower(unitType))] {
 					<option value={ elementBeingCompared }>{ elementBeingCompared }</option>
 				}
 			</select>
@@ -223,19 +131,19 @@ templ form(links Links) {
 			<label class="block text-gray-700 text-sm font-bold mb-2" for="unitToConvertTo">
 				Unit to Convert to
 			</label>
-			<select class="block appearance-none w-full bg-white border border-gray-400 hover:border-gray-500 px-4 py-2 pr-8 rounded shadow leading-tight focus:border-accent" name="unitToConvertTo">
-				for _, elementBeingCompared := range FirstSelection[services.UnitType(strings.ToLower(links.getURLActive()))] {
+			<select class="block appearance-none w-full bg-white border border-gray-400 hover:border-gray-500 px-4 py-2 pr-8 rounded shadow leading-tight focus:border-accent" data-model="unitToConvertTo">
+				for _, elementBeingCompared := range FirstSelection[services.UnitType(strings.ToLower(unitType))] {
 					<option value={ elementBeingCompared }>{ elementBeingCompared }</option>
 				}
 			</select>
 		</div>
-		<button type="submit" class="bg-primary px-10 py-2 text-xl font-semibold text-background rounded hover:brightness-90 shadow shadow-primary/10">
+		<button type="button" data-on-click="$$post('/result')" class="bg-primary px-10 py-2 text-xl font-semibold text-background rounded hover:brightness-90 shadow shadow-primary/10">
 			Convert
 		</button>
-	</form>
+	</div>
+	// </form>
 }
 
-func parseURL(links Links) string {
-	unitType := links.getURLActive()
+func parseURL(unitType string) string {
 	return fmt.Sprintf("/result?unitType=%s", unitType)
 }
